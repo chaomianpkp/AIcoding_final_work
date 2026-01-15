@@ -1,0 +1,24 @@
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+    "torch>=2.0",
+    "ninja",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mytensor"
+version = "0.1.0"
+description = "Pybind11 bindings for custom CUDA Tensor and NN operators"
+authors = [{name = "AI Programming Course"}]
+requires-python = ">=3.8"
+dependencies = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "numpy",
+]
+
+[tool.setuptools]
+packages = ["mytensor"]
+
