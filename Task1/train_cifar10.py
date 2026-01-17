@@ -1,9 +1,3 @@
-# 用pytorch实现卷积神经网络，对cifar10数据集进行分类
-# 要求:1. 使用pytorch的nn.Module和Conv2d等相关的API实现卷积神经网络
-#      2. 使用pytorch的DataLoader和Dataset等相关的API实现数据集的加载
-#      3. 修改网络结构和参数，观察训练效果
-#      4. 使用数据增强，提高模型的泛化能力
-
 import argparse
 import os
 import json
@@ -19,10 +13,10 @@ from torchvision import transforms
 
 
 class Net(nn.Module):
-    """改进的CNN网络，预期准确率提升至75-80%"""
+    """改进的CNN网络"""
     def __init__(self, num_classes=10):
         super(Net, self).__init__()
-        # 改进的卷积层：更深的网络，更多的通道
+
         # 第一组卷积：3 -> 64
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3, padding=1)
         self.conv2 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
@@ -41,10 +35,10 @@ class Net(nn.Module):
         self.fc2 = nn.Linear(512, 256)
         self.fc3 = nn.Linear(256, num_classes)
         
-        # Dropout层（防止过拟合）
+        # Dropout层
         self.dropout = nn.Dropout(0.5)
         
-        # 初始化权重（Kaiming初始化适用于ReLU）
+        # 初始化权重（Kaiming初始化）
         self._initialize_weights()
     
     def _initialize_weights(self):
@@ -345,11 +339,10 @@ def train(args):
     log_dir = args.log_dir
     os.makedirs(log_dir, exist_ok=True)
     
-    # 生成日志文件名（包含时间戳和配置信息）
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # 生成日志文件名（包含配置信息）
     model_name = args.model
     optimizer_name = args.optimizer
-    log_filename = f"training_log_{model_name}_{optimizer_name}_{timestamp}.json"
+    log_filename = f"training_log_{model_name}_{optimizer_name}.json"
     log_path = os.path.join(log_dir, log_filename)
     
     with open(log_path, 'w', encoding='utf-8') as f:

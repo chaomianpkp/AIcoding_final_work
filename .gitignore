@@ -17,6 +17,7 @@ dist/
 # 数据文件和日志
 data/
 logs/
+figures/
 *.log
 
 # 模型检查点文件
