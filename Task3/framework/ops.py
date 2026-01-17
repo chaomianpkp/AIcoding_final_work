@@ -60,12 +60,12 @@ class MaxPool2dOp(Op):
         self.y = None
 
     def forward(self):
-        y = _C.maxpool_forward(self.x.data)
+        y = _C.maxpool2d_forward(self.x.data)
         self.y = y
         return Tensor(y, requires_grad=self.x.requires_grad, op=self, inputs=[self.x])
 
     def backward(self, grad_output):
-        dx = _C.maxpool_backward(self.x.data, self.y, grad_output)
+        dx = _C.maxpool2d_backward(self.x.data, self.y, grad_output)
         return [dx]
 
 

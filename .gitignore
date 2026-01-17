@@ -1,9 +1,82 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
 *.pyd
 *.so
 *.o
+*.egg
+*.egg-info/
+.eggs/
+
+# 构建和分发
 build/
 dist/
 *.egg-info/
+
+# 数据文件和日志
 data/
+logs/
+*.log
+
+# 模型检查点文件
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.pb
+checkpoints/
+models/
+
+# 虚拟环境
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE 配置文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints
+
+# CUDA 编译文件
+*.cu.o
+*.fatbin
+*.cubin
+*.ptx
+*.sass
+*.cudafe*
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/

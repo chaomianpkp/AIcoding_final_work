@@ -18,11 +18,12 @@ python setup.py build_ext --inplace
 ## 训练
 
 ```bash
-cd /Users/chaomian/Desktop/人工智能中的编程/最终作业/Task3
+cd ..
 python train_cifar10.py --epochs 5 --batch-size 64 --optimizer adam --device cpu
+python train_cifar10.py --epochs 5 --batch-size 64 --optimizer adam --device gpu
 ```
 
-> 如果机器有 GPU 并已配置 CUDA，可将 `--device` 改为 `gpu`。
+> 如果机器有 GPU 并已配置 CUDA，可将 `--device` 改为 `gpu`。1
 
 ## 说明
 

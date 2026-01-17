@@ -48,7 +48,12 @@ def train(args):
 
     for epoch in range(1, args.epochs + 1):
         losses = []
+        batch_count = 0
+        total_batches = (len(X_train) + args.batch_size - 1) // args.batch_size
         for Xb, yb in batch_iter(X_train, y_train, batch_size=args.batch_size, shuffle=True):
+            batch_count += 1
+            if batch_count % 50 == 0 or batch_count == 1:
+                print(f"  Processing batch {batch_count}/{total_batches}...")
             xb = Tensor(tensor_from_numpy(Xb, device), requires_grad=False)
             yb = Tensor(tensor_from_numpy(yb.astype(np.float32), device), requires_grad=False)
             model.zero_grad()

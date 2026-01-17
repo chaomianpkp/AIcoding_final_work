@@ -153,14 +153,15 @@ void Linear_forward(const Tensor& X, const Tensor& W, const Tensor& b, Tensor& Y
         const float beta = 0.0f;
         
         // Y = X * W^T (using cublasSgemm)
-        //  Y^T[Cout, N] = W^T[Cout, Cin] * X[Cin, N] = W[Cout, Cin] (in row-major) * X^T[Cin, N]
-        cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_N,
-                    Cout, N, Cin,
-                    &alpha,
-                    W.data(), Cin,    // A = W^T [Cout, Cin] (W is [Cin, Cout] col-major), lda = Cin
-                    X.data(), Cin,    // B = X [Cin, N] col-major, ldb = Cin
-                    &beta,
-                    Y.data(), Cout);  // C = Y^T [Cout, N] col-major, ldc = Cout
+        // X: [N, Cin], W: [Cout, Cin], Y: [N, Cout]
+        cublasSgemm(handle,
+            CUBLAS_OP_T, CUBLAS_OP_N,   // 关键：A用T，B用N
+            Cout, N, Cin,
+            &alpha,
+            W.data(), Cin,              // lda = Cin
+            X.data(), Cin,              // ldb = Cin  ✅ param#10 = Cin
+            &beta,
+            Y.data(), Cout);            // ldc = Cout
         
         // Add bias: Y = Y + b (broadcast)
         dim3 threads(256);
@@ -231,23 +232,24 @@ void Linear_backward(const Tensor& X, const Tensor& W, const Tensor& dY,
         // Row-major: dX[N, Cin] = dY[N, Cout] * W[Cout, Cin]
         // dX^T[Cin, N] = W[Cin, Cout] * dY[Cout, N]
         cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N,
-                    Cin, N, Cout,
-                    &alpha,
-                    W.data(), Cin,    // A = W[Cin, Cout] col-major, op(A)=N gives W[Cin, Cout]
-                    dY.data(), Cout,  // B = dY[Cout, N] col-major, op(B)=N gives dY[Cout, N]
-                    &beta,
-                    dX.data(), Cin);  // C = dX^T[Cin, N] col-major, ldc = Cin
+            Cin, N, Cout,
+            &alpha,
+            W.data(), Cin,     // ✅ lda = Cin
+            dY.data(), Cout,   // ldb = Cout
+            &beta,
+            dX.data(), Cin);   // ldc = Cin
         
         // dW = dY^T * X
         // Row-major: dW[Cout, Cin] = dY^T[Cout, N] * X[N, Cin]
         // In cuBLAS: dW^T[Cin, Cout] = X^T[Cin, N] * dY[Cout, N]
-        cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_T,
-                    Cin, Cout, N,
-                    &alpha,
-                    X.data(), Cin,    // A = X[Cin, N] col-major, op(A)=N gives X[Cin, N]
-                    dY.data(), Cout,  // B = dY[Cout, N] col-major, op(B)=T gives dY^T[N, Cout]
-                    &beta,
-                    dW.data(), Cin);  // C = dW^T[Cin, Cout] col-major, ldc = Cin
+        cublasSgemm(handle,
+            CUBLAS_OP_N, CUBLAS_OP_T,
+            Cin, Cout, N,
+            &alpha,
+            X.data(), Cin,      // lda = Cin
+            dY.data(), Cout,    // ldb = Cout
+            &beta,
+            dW.data(), Cin);    // ✅ ldc = Cin
         
         // db = sum(dY, axis=0)
         dim3 threads(256);
@@ -543,13 +545,18 @@ void Conv2d_forward(const Tensor& X, const Tensor& W, const Tensor& b, Tensor& Y
         const float beta = 0.0f;
         
         // Y_col = Col * W_col^T
-        cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_T,
-                    N * H_out * W_out, Cout, Cin * K * K,
+        int R = N * H_out * W_out;
+        int Kdim = Cin * K * K;
+        
+        cublasSgemm(handle,
+                    CUBLAS_OP_T, CUBLAS_OP_N,
+                    Cout, R, Kdim,
                     &alpha,
-                    Col.data(), N * H_out * W_out,
-                    W_col.data(), Cout,
+                    W_col.data(), Kdim,   // lda = K
+                    Col.data(),   Kdim,   // ldb = K
                     &beta,
-                    Y_col.data(), N * H_out * W_out);
+                    Y_col.data(), Cout);  // ldc = Cout
+        
         
         cublasDestroy(handle);
     } else {
@@ -647,13 +654,18 @@ void Conv2d_backward(const Tensor& X, const Tensor& W, const Tensor& dY,
         const float beta = 0.0f;
         
         // dW_col = dY_col^T * Col
-        cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_N,
-                    Cout, Cin * K * K, N * H_out * W_out,
+        int R = N * H_out * W_out;
+        int Kdim = Cin * K * K;
+        
+        cublasSgemm(handle,
+                    CUBLAS_OP_N, CUBLAS_OP_T,
+                    Kdim, Cout, R,
                     &alpha,
-                    dY_col.data(), N * H_out * W_out,
-                    Col.data(), N * H_out * W_out,
+                    Col.data(),   Kdim,   // lda = K
+                    dY_col.data(), Cout,  // ldb = Cout
                     &beta,
-                    dW_col.data(), Cout);
+                    dW_col.data(), Kdim); // ldc = K   (注意！不是 Cout)
+        
         
         cublasDestroy(handle);
     } else {
@@ -690,14 +702,17 @@ void Conv2d_backward(const Tensor& X, const Tensor& W, const Tensor& dY,
         const float alpha = 1.0f;
         const float beta = 0.0f;
         
-        // dCol = dY_col * W_col
-        cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N,
-                    N * H_out * W_out, Cin * K * K, Cout,
-                    &alpha,
-                    dY_col.data(), N * H_out * W_out,
-                    W_col.data(), Cout,
-                    &beta,
-                    dCol.data(), N * H_out * W_out);
+        int R = N * H_out * W_out;
+        int Kdim = Cin * K * K;
+        
+        cublasSgemm(handle,
+            CUBLAS_OP_N, CUBLAS_OP_N,
+            Kdim, R, Cout,
+            &alpha,
+            W_col.data(),  Kdim,   // lda = K
+            dY_col.data(), Cout,   // ldb = Cout
+            &beta,
+            dCol.data(),   Kdim);  // ldc = K
         
         cublasDestroy(handle);
     } else {
@@ -1011,4 +1026,3 @@ void CrossEntropyLoss_backward(const Tensor& probs, const Tensor& labels, Tensor
 
     dLogits.fill_with(grad_vec);
 }
-
