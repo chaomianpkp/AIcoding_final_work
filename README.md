@@ -2,11 +2,11 @@
 
 本项目实现了基于 CIFAR-10 数据集的图像分类系统，包含三个主要任务：PyTorch 基础实现、并行训练实践和自定义 CUDA 框架实现。
 
-## 📋 项目概述
+## 项目概述
 
 CIFAR-10 数据集包含 10 个类别的 32×32 彩色图像。本项目通过三个递进的任务，从使用 PyTorch 框架到自主实现 CUDA 框架，全面展示了深度学习框架的实现原理和优化方法。
 
-## 🎯 任务说明
+##  任务说明
 
 ### Task 1: PyTorch 基础实现
 
@@ -85,7 +85,7 @@ python train_cifar10.py --epochs 10 --batch-size 64 --optimizer adam --device gp
 
 详细说明请参考：[Task3/README.md](Task3/README.md)
 
-## 🔧 环境要求
+##  环境要求
 
 ### 基础环境
 - Python >= 3.8
@@ -109,7 +109,7 @@ pip install torch torchvision numpy matplotlib
 pip install pybind11
 ```
 
-## 📁 项目结构
+##  项目结构
 
 ```
 AIcoding_final_work/
@@ -139,7 +139,7 @@ AIcoding_final_work/
     └── README.md            # 详细使用说明
 ```
 
-## 🚀 快速开始
+##  快速开始
 
 ### 1. Task1：PyTorch 基础实现
 
@@ -178,29 +178,16 @@ cd ..
 python train_cifar10.py --epochs 10 --device gpu
 ```
 
-## 📊 实验结果
 
-### Task1 性能
-- **Improved CNN + 数据增强 + 学习率调度**：准确率 ~78-82%
-- **训练时间**：约 2-3 分钟/epoch（GPU）
-
-### Task2 性能
-- **数据并行（2 GPU）**：加速比 ~1.5-1.8x
-- **模型并行（2 GPU）**：适合超大模型，加速效果取决于模型大小
-
-### Task3 性能
-- **基础模型**：准确率 ~65-75%
-- **改进后**：准确率 ~75-85%（参考 accuracy_improvement_guide.md）
-
-## 📝 使用说明
+##  使用说明
 
 每个 Task 都有详细的 README 文档：
 
-- **Task1**: [README_training.md](Task1/README_training.md) - 包含训练配置、可视化说明
+- **Task1**: [README_training.md](Task1/README.md) - 包含训练配置、可视化说明
 - **Task2**: [README.md](Task2/README.md) - 包含并行训练详细说明
 - **Task3**: [README.md](Task3/README.md) - 包含编译和训练说明
 
-## 🔍 关键文件说明
+##  关键文件说明
 
 ### Task1
 - `AIHW1.py`: 主训练脚本，支持多种配置
@@ -217,7 +204,7 @@ python train_cifar10.py --epochs 10 --device gpu
 - `framework/`: Python 端自动微分框架
 - `train_cifar10.py`: 训练脚本
 
-## ⚠️ 注意事项
+##  注意事项
 
 1. **数据加载**：所有 Task 使用 `torchvision` 自动下载 CIFAR-10 数据集
 2. **GPU 要求**：
@@ -227,37 +214,9 @@ python train_cifar10.py --epochs 10 --device gpu
 4. **日志保存**：Task1 自动保存训练日志到 `logs/` 目录
 5. **可视化**：Task1 自动生成可视化图片到 `figures/` 目录
 
-## 📚 参考资料
+## 参考资料
 
 - [PyTorch 官方文档](https://pytorch.org/docs/)
 - [CUDA Programming Guide](https://docs.nvidia.com/cuda/)
 - [Pybind11 文档](https://pybind11.readthedocs.io/)
 - [CIFAR-10 数据集](https://www.cs.toronto.edu/~kriz/cifar.html)
-
-## 📄 提交说明
-
-根据作业要求，提交内容应包括：
-
-- **Task1/**: 代码文件 + 使用文档和分析报告（PDF）
-- **Task2/**: 代码文件 + 使用文档和分析报告（PDF）
-- **Task3/**: 代码文件 + 使用文档和分析报告（PDF）
-
-提交格式：`Project_学号_姓名.zip`
-
-## 🎓 学习要点
-
-通过本项目的三个任务，你将学习到：
-
-1. **深度学习框架使用**：PyTorch 的模型定义、训练流程、数据增强
-2. **并行计算**：数据并行和模型并行的原理与实现
-3. **底层实现**：CUDA 编程、自动微分、优化器实现
-4. **性能优化**：模型架构优化、训练策略优化、并行加速
-
-## 📧 联系方式
-
-如有问题，请参考各 Task 的详细 README 文档或查看代码注释。
-
----
-
-**最后更新**：2026-01-17
-
